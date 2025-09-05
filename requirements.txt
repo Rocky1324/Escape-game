@@ -1,2 +1,3 @@
 flask
 werkzeug
+pip freeze > requirements.txt
