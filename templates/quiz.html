@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Escape Game - Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            background: #ddd;
+            border-radius: 20px;
+            margin: 20px 0;
+            height: 20px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: {{ (progress / total) * 100 }}%;
+            background: #0078D7;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('profil') }}">Profil</a>
+        <a href="{{ url_for('logout') }}">Déconnexion</a>
+    </nav>
+
+    <main>
+        <h1>Énigme {{ progress }}/{{ total }}</h1>
+
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+
+        {% if histoire %}
+            <p><em>{{ histoire }}</em></p>
+        {% endif %}
+
+        <h2>{{ question }}</h2>
+        <form method="POST">
+            {% for option in options %}
+                <label>
+                    <input type="radio" name="reponse" value="{{ option }}" required>
+                    {{ option }}
+                </label><br>
+            {% endfor %}
+            {% if not feedback %}
+                <button type="submit">Valider</button>
+            {% endif %}
+        </form>
+
+        {% if feedback %}
+            <div class="feedback">{{ feedback }}</div>
+            <!-- Lien pour charger la question suivante -->
+            <a href="{{ url_for('quiz') }}" class="btn">Question suivante</a>
+        {% endif %}
+
+        <p><strong>Score :</strong> {{ score }}/{{ total }}</p>
+    </main>
+</body>
+</html>

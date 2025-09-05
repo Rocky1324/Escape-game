@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Quiz SVT{% endblock %}
+{% block content %}
+<h2>🧩 Escape Game SVT – Quiz</h2>
+
+<form method="post">
+    <p><b>Question :</b> {{ question }}</p>
+
+    {% for option in options %}
+        <label>
+            <input type="radio" name="reponse" value="{{ option }}" required>
+            {{ option }}
+        </label><br>
+    {% endfor %}
+
+    <button type="submit">Valider</button>
+</form>
+
+{% if feedback %}
+    <p class="feedback">{{ feedback }}</p>
+{% endif %}
+
+<!-- Bouton pour passer à une autre question -->
+<form method="get" action="{{ url_for('quiz') }}">
+    <button type="submit">⏭ Passer à une autre question</button>
+</form>
+
+<a href="{{ url_for('profil') }}">⬅ Retour au profil</a>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil - {{ username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('main') }}">Accueil</a>
+        <a href="{{ url_for('quiz') }}">Jouer</a>
+        <a href="{{ url_for('leaderboard') }}">Classement</a>
+        <a href="{{ url_for('logout') }}">Déconnexion</a>
+        <a href="{{ url_for('presentation') }}">Presentation</a>
+    </nav>
+
+    <main>
+        <h1>👤 Profil de {{ username }}</h1>
+
+        <!-- Infos de base -->
+        <section class="profil-info">
+            <h2>Informations générales</h2>
+            <p><strong>Nom d'utilisateur :</strong> {{ username }}</p>
+            <p><strong>Score actuel (partie en cours) :</strong> {{ score }}/5</p>
+        </section>
+
+        <!-- Statistiques -->
+        <section class="profil-stats">
+            <h2>Statistiques</h2>
+            <p><strong>Total de victoires (5/5 obtenus) :</strong> {{ victories }}</p>
+            <p><strong>Taux de réussite :</strong> {{ winrate }}%</p>
+        </section>
+
+        <!-- Actions -->
+        <section class="profil-actions">
+            <h2>Que veux-tu faire ?</h2>
+            <a href="{{ url_for('retry') }}" class="btn">🎮 Lancer une nouvelle partie</a>
+            <a href="{{ url_for('leaderboard') }}" class="btn">🏆 Voir le classement</a>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Échec ❌</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('profil') }}">Profil</a>
+        <a href="{{ url_for('logout') }}">Déconnexion</a>
+    </nav>
+
+    <main>
+        <h1>❌ Dommage {{ username }}...</h1>
+        <p>Tu n’as pas réussi à résoudre toutes les énigmes correctement.</p>
+        <p><strong>Score final :</strong> {{ score }}/5</p>
+
+        <div style="margin-top:20px;">
+            <a href="{{ url_for('retry') }}" class="btn">🔄 Réessayer</a>
+            <a href="{{ url_for('main') }}" class="btn">🏠 Retour à l'accueil</a>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,159 @@
+/* Reset & base */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(to bottom, #2c2c2c, #0d0d0d);
+    margin: 0;
+    padding: 0;
+    color: #f4f4f9;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Titres */
+h1, h2 {
+    color: #ff5252;
+    text-shadow: 2px 2px 8px black;
+    letter-spacing: 1px;
+}
+
+/* Navigation */
+nav {
+    background: #111;
+    padding: 12px;
+    border-bottom: 3px solid #b71c1c;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+}
+
+nav a {
+    color: #f4f4f9;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: #ff5252;
+    text-decoration: underline;
+}
+
+/* Sections principales */
+main {
+    flex: 1;
+    padding: 30px 20px;
+}
+
+section.doc, section.groupe {
+    background: #1e1e1e;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,82,82,0.3);
+    text-align: left;
+    max-width: 800px;
+    line-height: 1.6;
+}
+
+/* Formulaires */
+form {
+    margin: 20px auto;
+    padding: 20px;
+    background: #2a2a2a;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(183,28,28,0.5);
+    max-width: 600px;
+}
+
+input[type="text"], input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #b71c1c;
+    border-radius: 5px;
+    background: #111;
+    color: #f4f4f9;
+}
+
+/* Boutons */
+button, .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    margin: 10px;
+    background: #b71c1c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+
+button:hover, .btn:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+}
+
+/* Feedback réponses */
+.feedback {
+    margin-top: 20px;
+    padding: 12px;
+    background: #2e2e2e;
+    color: #ffccbc;
+    border: 1px solid #b71c1c;
+    border-radius: 6px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+    animation: fadeIn 0.5s ease;
+}
+
+/* Animation shake pour mauvaise réponse */
+.shake {
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+    100% { transform: translateX(0); }
+}
+
+/* Animation fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Score / progression */
+.progress-container {
+    background: #333;
+    border-radius: 8px;
+    margin: 20px auto;
+    height: 20px;
+    width: 80%;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff5252, #ff8a65);
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+p:has(strong), p:has(span.score) {
+    background: #133;
+    padding: 10px 15px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #4db6ac;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}

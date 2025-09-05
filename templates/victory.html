@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Victoire 🎉</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main>
+        <h1>🎉 Bravo {{ username }} !</h1>
+        <p>Tu as réussi à t’échapper de la ville secouée par le séisme.</p>
+        <p><strong>Score final :</strong> {{ score }}/5</p>
+        <a href="{{ url_for('retry') }}" class="btn">🔄 Réessayer</a>
+        <a href="{{ url_for('main') }}" class="btn">Retour à l'accueil</a>
+    </main>
+</body>
+</html>

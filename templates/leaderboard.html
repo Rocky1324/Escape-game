@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Classement</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('profil') }}">Profil</a>
+        <a href="{{ url_for('logout') }}">Déconnexion</a>
+    </nav>
+
+    <main>
+        <h1>🏆 Classement des joueurs</h1>
+
+        {% if leaderboard %}
+        <table border="1" style="margin:auto; border-collapse: collapse; width:70%;">
+            <tr>
+                <th>Position</th>
+                <th>Joueur</th>
+                <th>Victoires (5/5)</th>
+                <th>Parties jouées</th>
+                <th>Taux de réussite (%)</th>
+            </tr>
+            {% for row in leaderboard %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>
+                    {% if row[2] > 0 %}
+                        {{ "%.1f"|format((row[1] / row[2]) * 100) }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p style="text-align:center; margin-top:20px;">
+                Aucun joueur classé pour le moment. 🚀
+            </p>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Présentation du Projet{% endblock %}
+{% block content %}
+<h2>Présentation du Projet – Escape Game SVT</h2>
+
+<section class="doc">
+    <p>
+        Ce projet a été conçu dans le cadre du cours de <strong>Sciences de la Vie et de la Terre</strong> (SVT),
+        avec pour objectif de rendre plus accessible et interactif l’apprentissage de la
+        <em>tectonique des plaques</em>.
+    </p>
+    <p>
+        Un <strong>Escape Game numérique</strong>.
+        Le principe est simple : le joueur est coincé dans une ville secouée par un séisme 🔥🌍.
+        Pour s’échapper, il doit répondre correctement à une série de 5 énigmes scientifiques.
+    </p>
+    <p>
+        Chaque question est directement liée aux notions étudiées : 
+        <strong>dorsales, failles transformantes, zones de subduction, volcans, séismes et risques en Haïti</strong>.
+    </p>
+</section>
+
+<section class="doc">
+    <h3>🎯 Objectifs pédagogiques</h3>
+    <ul>
+        <li>Revoir les concepts clés de la <em>tectonique des plaques</em>.</li>
+        <li>Comprendre les liens entre <strong>mouvements des plaques</strong> et <strong>phénomènes naturels</strong> (séismes, volcans).</li>
+        <li>Relier les notions théoriques aux <strong>risques concrets en Haïti</strong>.</li>
+        <li>Développer la <strong>logique, la mémoire et la rapidité de réflexion</strong>.</li>
+    </ul>
+</section>
+
+<section class="doc">
+    <h3>⚙️ Fonctionnement du jeu</h3>
+    <ol>
+        <li>Le joueur s’inscrit ou se connecte pour enregistrer ses progrès.</li>
+        <li>Il doit répondre à <strong>5 énigmes aléatoires</strong>.</li>
+        <li>Une seule mauvaise réponse = échec ❌ (il devra réessayer).</li>
+        <li>Une réussite parfaite (5/5) = victoire 🎉 et ajout d’une victoire au classement général.</li>
+        <li>Un <strong>classement des joueurs</strong> est disponible, basé sur le nombre de victoires.</li>
+    </ol>
+</section>
+
+<section class="groupe">
+    <h3>👥 Membres du groupe</h3>
+    <p>Ce projet a été réalisé par un groupe d’élèves de <em>Secondaire I</em> :</p>
+    <ul>
+        <li>Khyshnert Rock</li>
+        <li>Opnt Dorroti</li>
+        <li>Pierre Louis Hilaris</li>
+        <li>Dorvilien Delors</li>
+        <li>Shekinah Chery</li>
+        <li>Dasque Saina</li>
+        <li>Amicy Christian</li>
+        <li>Desir Cedrick</li>
+    </ul>
+</section>
+
+<section class="doc">
+    <h3>📚 Références et inspirations</h3>
+    <p>
+        Les questions ont été élaborées à partir du cours de SVT ainsi que de ressources en ligne 
+        (USGS, encyclopédies scientifiques, manuels scolaires).  
+        Le projet utilise la technologie <strong>Flask (Python)</strong>, une base de données <strong>SQLite</strong>,
+        et des langages web (<em>HTML, CSS, JS</em>) pour l’interface.
+    </p>
+</section>
+
+<a href="{{ url_for('quiz') }}" class="btn">🚀 Commencer le Quiz</a>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Erreur{% endblock %}
+{% block content %}
+<h2 style="color:red;">❌ Nom d'utilisateur ou mot de passe incorrect</h2>
+<a href="{{ url_for('login') }}">Réessayer</a>
+{% endblock %}
