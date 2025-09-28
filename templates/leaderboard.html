@@ -1,49 +1,505 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Classement</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <nav>
-        <a href="{{ url_for('profil') }}">Profil</a>
-        <a href="{{ url_for('logout') }}">Déconnexion</a>
-    </nav>
+{% extends "base.html" %}
 
-    <main>
-        <h1>🏆 Classement des joueurs</h1>
+{% block title %}🏆 Classement des joueurs{% endblock %}
 
-        {% if leaderboard %}
-        <table border="1" style="margin:auto; border-collapse: collapse; width:70%;">
-            <tr>
-                <th>Position</th>
-                <th>Joueur</th>
-                <th>Victoires (5/5)</th>
-                <th>Parties jouées</th>
-                <th>Taux de réussite (%)</th>
-            </tr>
-            {% for row in leaderboard %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ row[0] }}</td>
-                <td>{{ row[1] }}</td>
-                <td>{{ row[2] }}</td>
-                <td>
-                    {% if row[2] > 0 %}
-                        {{ "%.1f"|format((row[1] / row[2]) * 100) }}
+{% block extra_css %}
+<style>
+    .leaderboard-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .leaderboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .leaderboard-title {
+        font-size: 3rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        margin-bottom: 1rem;
+        animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+        from { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); }
+        to { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6)); }
+    }
+
+    .leaderboard-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .leaderboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(30, 30, 30, 0.8);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .stat-card:hover::before {
+        left: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 215, 0, 0.6);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ffd700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .leaderboard-table-container {
+        background: rgba(30, 30, 30, 0.9);
+        border-radius: 16px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .leaderboard-table-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .leaderboard-table thead {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 237, 78, 0.1));
+    }
+
+    .leaderboard-table th {
+        padding: 1.2rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    .leaderboard-table th:first-child {
+        text-align: center;
+        width: 80px;
+    }
+
+    .leaderboard-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .leaderboard-table tbody tr:hover {
+        background: rgba(255, 215, 0, 0.1);
+        transform: scale(1.01);
+    }
+
+    .leaderboard-table tbody tr:nth-child(odd) {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .leaderboard-table td {
+        padding: 1.2rem 1rem;
+        color: var(--text-primary);
+        vertical-align: middle;
+    }
+
+    .position-cell {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .position-1 { color: #ffd700; }
+    .position-2 { color: #c0c0c0; }
+    .position-3 { color: #cd7f32; }
+    .position-other { color: var(--text-secondary); }
+
+    .player-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .player-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-red), var(--accent-orange));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .victories-cell {
+        text-align: center;
+        font-weight: 600;
+        color: #4caf50;
+    }
+
+    .games-cell {
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .winrate-cell {
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .winrate-excellent { color: #4caf50; }
+    .winrate-good { color: #8bc34a; }
+    .winrate-average { color: #ff9800; }
+    .winrate-poor { color: #f44336; }
+
+    .podium {
+        display: flex;
+        justify-content: center;
+        align-items: end;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: rgba(30, 30, 30, 0.8);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+
+    .podium-place {
+        text-align: center;
+        position: relative;
+    }
+
+    .podium-1 {
+        order: 2;
+    }
+
+    .podium-2 {
+        order: 1;
+    }
+
+    .podium-3 {
+        order: 3;
+    }
+
+    .podium-player {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 237, 78, 0.1));
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .podium-1 .podium-player {
+        border-color: #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    .podium-2 .podium-player {
+        border-color: #c0c0c0;
+        box-shadow: 0 0 15px rgba(192, 192, 192, 0.2);
+    }
+
+    .podium-3 .podium-player {
+        border-color: #cd7f32;
+        box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
+    }
+
+    .podium-player:hover {
+        transform: translateY(-5px);
+    }
+
+    .podium-rank {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .podium-1 .podium-rank { color: #ffd700; }
+    .podium-2 .podium-rank { color: #c0c0c0; }
+    .podium-3 .podium-rank { color: #cd7f32; }
+
+    .podium-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .podium-stats {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-leaderboard {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-leaderboard h3 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .empty-leaderboard p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .call-to-action {
+        display: inline-block;
+        background: linear-gradient(45deg, var(--primary-red), var(--accent-orange));
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .call-to-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 82, 82, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .leaderboard-container {
+            padding: 1rem;
+        }
+
+        .leaderboard-title {
+            font-size: 2rem;
+        }
+
+        .podium {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .podium-1, .podium-2, .podium-3 {
+            order: unset;
+        }
+
+        .leaderboard-table-container {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .leaderboard-table {
+            min-width: 600px;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 0.8rem 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .leaderboard-title {
+            font-size: 1.5rem;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 0.6rem 0.3rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h1 class="leaderboard-title">🏆 Classement des Champions</h1>
+        <p class="leaderboard-subtitle">Découvrez les meilleurs joueurs de l'Escape Game SVT</p>
+    </div>
+
+    {% if leaderboard %}
+        <!-- Statistics Cards -->
+        <div class="leaderboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ leaderboard|length }}</div>
+                <div class="stat-label">Joueurs Classés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ leaderboard|sum(attribute='1') if leaderboard else 0 }}</div>
+                <div class="stat-label">Victoires Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ leaderboard|sum(attribute='2') if leaderboard else 0 }}</div>
+                <div class="stat-label">Parties Jouées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% if leaderboard %}
+                        {{ "%.1f"|format((leaderboard|sum(attribute='1') / leaderboard|sum(attribute='2') * 100) if leaderboard|sum(attribute='2') > 0 else 0) }}%
                     {% else %}
-                        0
+                        0%
                     {% endif %}
-                </td>
-            </tr>
+                </div>
+                <div class="stat-label">Taux Moyen</div>
+            </div>
+        </div>
+
+        <!-- Podium for Top 3 -->
+        {% if leaderboard|length >= 3 %}
+        <div class="podium">
+            {% for i in range(3) %}
+            <div class="podium-place podium-{{ i+1 }}">
+                <div class="podium-player">
+                    <div class="podium-rank">
+                        {% if i == 0 %}🥇{% elif i == 1 %}🥈{% else %}🥉{% endif %}
+                    </div>
+                    <div class="podium-name">{{ leaderboard[i][0] }}</div>
+                    <div class="podium-stats">
+                        {{ leaderboard[i][1] }} victoires<br>
+                        {{ leaderboard[i][2] }} parties<br>
+                        {% if leaderboard[i][2] > 0 %}
+                            {{ "%.1f"|format((leaderboard[i][1] / leaderboard[i][2]) * 100) }}% de réussite
+                        {% else %}
+                            0% de réussite
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-        </table>
-        {% else %}
-            <p style="text-align:center; margin-top:20px;">
-                Aucun joueur classé pour le moment. 🚀
-            </p>
+        </div>
         {% endif %}
-    </main>
-</body>
-</html>
+
+        <!-- Full Leaderboard Table -->
+        <div class="leaderboard-table-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>🏆</th>
+                        <th> Joueur</th>
+                        <th> Victoires</th>
+                        <th> Parties</th>
+                        <th> Taux de Réussite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in leaderboard %}
+                    <tr>
+                        <td class="position-cell position-{{ loop.index if loop.index <= 3 else 'other' }}">
+                            {% if loop.index == 1 %}
+                                🥇
+                            {% elif loop.index == 2 %}
+                                🥈
+                            {% elif loop.index == 3 %}
+                                🥉
+                            {% else %}
+                                {{ loop.index }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="player-name">
+                                <div class="player-avatar">
+                                    {{ row[0][0].upper() }}
+                                </div>
+                                {{ row[0] }}
+                            </div>
+                        </td>
+                        <td class="victories-cell">{{ row[1] }}</td>
+                        <td class="games-cell">{{ row[2] }}</td>
+                        <td class="winrate-cell 
+                            {% if row[2] > 0 %}
+                                {% set winrate = (row[1] / row[2]) * 100 %}
+                                {% if winrate >= 80 %}winrate-excellent
+                                {% elif winrate >= 60 %}winrate-good
+                                {% elif winrate >= 40 %}winrate-average
+                                {% else %}winrate-poor{% endif %}
+                            {% else %}winrate-poor{% endif %}">
+                            {% if row[2] > 0 %}
+                                {{ "%.1f"|format((row[1] / row[2]) * 100) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-leaderboard">
+            <h3> Aucun joueur classé pour le moment</h3>
+            <p>Soyez le premier à compléter le quiz et à apparaître sur le podium des champions !</p>
+            <a href="{{ url_for('quiz') }}" class="call-to-action">
+                Commencer le Quiz
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
