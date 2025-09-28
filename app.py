@@ -55,29 +55,29 @@ question_reponse = {
     # Tectonique des plaques
     "Les dorsales sont des zones où les plaques tectoniques": "S'éloignent.",
     "Quelle est la conséquence principale des failles transformantes ?": "Tremblement de terre.",
-    "Dans une zone de subduction, quelle plaque s’enfonce sous l’autre ?": "La plus lourde.",
+    "Dans une zone de subduction, quelle plaque s'enfonce sous l'autre ?": "La plus lourde.",
     "Quel phénomène se produit lorsque deux plaques continentales entrent en collision ?": "Formation de chaînes de montagnes.",
     "Quelle est la vitesse moyenne de déplacement des plaques tectoniques ?": "Quelques centimètres par an.",
     "Quel type de frontière de plaque est associé à la formation de fosses océaniques ?": "Convergente (subduction).",
 
     # Volcans
     "Pourquoi les volcans se forment-ils souvent dans les zones de subduction ?": "Parce que la plaque qui s'enfonce libère du magma.",
-    "Comment appelle-t-on une montagne formée par l’accumulation de lave ?": "Un volcan.",
+    "Comment appelle-t-on une montagne formée par l'accumulation de lave ?": "Un volcan.",
     "Quelle roche sort des volcans lors des éruptions ?": "Le magma (lave).",
     "Quel type de volcan est caractérisé par des éruptions explosives et des pentes raides ?": "Un stratovolcan.",
     "Quel gaz est le plus couramment émis lors d'une éruption volcanique ?": "La vapeur d'eau (H₂O).",
     "Quel est le nom du volcan le plus actif d'Haïti ?": "La Soufrière (en réalité, Haïti n'a pas de volcan actif, mais la question peut servir à sensibiliser).",
-    "Comment s’appelle la ceinture de volcans autour du Pacifique ?": "La ceinture de feu.",
-    "Quel est le nom du supercontinent qui existait il y a 200 millions d’années ?": "La Pangée.",
+    "Comment s'appelle la ceinture de volcans autour du Pacifique ?": "La ceinture de feu.",
+    "Quel est le nom du supercontinent qui existait il y a 200 millions d'années ?": "La Pangée.",
 
     # Séismes
     "Quel instrument permet de mesurer les séismes ?": "Un sismographe.",
     "Sur quelle échelle mesure-t-on la magnitude des séismes ?": "L'échelle de Richter.",
-    "Comment appelle-t-on l’onde la plus rapide générée par un séisme ?": "L’onde P.",
-    "Comment appelle-t-on l’onde la plus destructrice lors d’un séisme ?": "L’onde S.",
-    "Quelle énergie est libérée lors d’un séisme ?": "L’énergie élastique accumulée.",
+    "Comment appelle-t-on l'onde la plus rapide générée par un séisme ?": "L'onde P.",
+    "Comment appelle-t-on l'onde la plus destructrice lors d'un séisme ?": "L'onde S.",
+    "Quelle énergie est libérée lors d'un séisme ?": "L'énergie élastique accumulée.",
     "Quel séisme majeur a frappé Haïti le 12 janvier 2010 ?": "Magnitude 7.0.",
-    "Quelle ville d’Haïti a été la plus touchée par le séisme de 2010 ?": "Port-au-Prince.",
+    "Quelle ville d'Haïti a été la plus touchée par le séisme de 2010 ?": "Port-au-Prince.",
     "Quel type de faille provoque des séismes destructeurs comme en Haïti ?": "Faille transformante.",
     "Quel est le nom de la faille responsable du séisme de 2010 en Haïti ?": "La faille d'Enriquillo-Plantain Garden.",
     "Combien de personnes environ ont été touchées par le séisme de 2010 en Haïti ?": "Plus de 3 millions.",
@@ -104,7 +104,7 @@ question_reponse = {
     "Quel type de construction résiste le mieux aux séismes ?": "Les bâtiments parasismiques.",
 
     # Divers
-    "Quel type de mouvement crée les chaînes de montagnes comme l’Himalaya ?": "La collision de plaques.",
+    "Quel type de mouvement crée les chaînes de montagnes comme l'Himalaya ?": "La collision de plaques.",
     "Quel est le nom du point où un séisme commence à se propager ?": "L'hypocentre.",
     "Quel est le nom de la théorie qui explique le mouvement des plaques tectoniques ?": "La tectonique des plaques.",
     "Quel océan est entouré par la ceinture de feu du Pacifique ?": "L'océan Pacifique.",
@@ -124,11 +124,45 @@ narration = [
     "Tu entres dans la ville fissurée... "
 ]
 
-# Fonction pour normaliser les réponses (si besoin plus tard)
+# Fonction pour normaliser les réponses
 def normalize(text):
+    if not text:
+        return ""
     text = text.lower().strip()
     text = re.sub(r"[^\w\s]", "", text)
     return text
+
+# Fonction pour comparer les réponses de manière robuste
+def compare_answers(user_answer, correct_answer):
+    """
+    Compare user answer with correct answer using multiple methods for robustness
+    """
+    if not user_answer or not correct_answer:
+        return False
+    
+    # Method 1: Exact match (original)
+    if user_answer.strip() == correct_answer.strip():
+        return True
+    
+    # Method 2: Normalized comparison (remove punctuation and case)
+    if normalize(user_answer) == normalize(correct_answer):
+        return True
+    
+    # Method 3: Remove trailing punctuation and compare
+    user_clean = user_answer.strip().rstrip('.,!?;:')
+    correct_clean = correct_answer.strip().rstrip('.,!?;:')
+    if user_clean == correct_clean:
+        return True
+    
+    # Method 4: Check if user answer is contained in correct answer (for partial matches)
+    if normalize(user_answer) in normalize(correct_answer):
+        return True
+    
+    # Method 5: Check if correct answer is contained in user answer
+    if normalize(correct_answer) in normalize(user_answer):
+        return True
+    
+    return False
 
 # ---------------------------
 # Routes
@@ -184,7 +218,7 @@ def regist():
         cursor = connect.cursor()
         cursor.execute("SELECT id FROM user WHERE username = ?", (username,))
         if cursor.fetchone():
-            return "⚠️ Nom d’utilisateur déjà utilisé"
+            return "⚠️ Nom d'utilisateur déjà utilisé"
 
         ash = generate_password_hash(password)
         cursor.execute("INSERT INTO user(username, password) VALUES(?, ?)", (username, ash))
@@ -311,15 +345,26 @@ def quiz():
         question = session.get("question")
         bonne_reponse = question_reponse.get(question)
 
-        # Ajouter la question à l’historique SEULEMENT après une réponse
-        if question not in session["questions_done"]:
-            session["questions_done"].append(question)
+        # Debug information (remove in production)
+        print(f"DEBUG - Question: {question}")
+        print(f"DEBUG - User answer: '{reponse}'")
+        print(f"DEBUG - Correct answer: '{bonne_reponse}'")
+        print(f"DEBUG - Exact match: {reponse == bonne_reponse}")
+        print(f"DEBUG - Normalized comparison: {normalize(reponse) == normalize(bonne_reponse)}")
+        print(f"DEBUG - Robust comparison: {compare_answers(reponse, bonne_reponse)}")
 
-        if reponse == bonne_reponse:
+        # FIXED LOGIC: Check answer first, then decide what to do
+        is_correct = compare_answers(reponse, bonne_reponse)
+        
+        if is_correct:
+            # Correct answer: increment score and add to questions_done
             session["score"] = session.get("score", 0) + 1
+            session["questions_done"].append(question)
             feedback = "✔️ Bonne réponse !"
         else:
+            # Wrong answer: don't add to questions_done, don't increment score
             feedback = f"❌ Mauvaise réponse. La bonne réponse était : {bonne_reponse}"
+            # The question remains available for retry (it's not added to questions_done)
 
         progress = len(session["questions_done"])
         histoire = narration[progress - 1] if progress - 1 < len(narration) else ""
