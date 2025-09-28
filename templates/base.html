@@ -2,23 +2,36 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Escape Game SVT{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='js-styles.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
+    
     <nav>
-        <a href="{{ url_for('main') }}">🏠 Accueil</a>
-        {% if session.get("username") %}
-            <a href="{{ url_for('profil') }}">👤 Profil</a>
-            <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
-        {% else %}
-            <a href="{{ url_for('login') }}">🔑 Connexion</a>
-            <a href="{{ url_for('regist') }}">📝 Inscription</a>
-            <a href="{{ url_for('presentation') }}">Presentation du projet</a>
-        {% endif %}
+        <a href="{{ url_for('main') }}" class="nav-brand">🌍 Escape Game SVT</a>
+        <div class="nav-links">
+            {% if session.get("username") %}
+                <a href="{{ url_for('profil') }}"> Profil</a>
+                <a href="{{ url_for('quiz') }}"> Quiz</a>
+                <a href="{{ url_for('leaderboard') }}"> Classement</a>
+                <a href="{{ url_for('logout') }}"> Déconnexion</a>
+            {% else %}
+                <a href="{{ url_for('main') }}"> Accueil</a>
+                <a href="{{ url_for('login') }}"> Connexion</a>
+                <a href="{{ url_for('regist') }}"> Inscription</a>
+                <a href="{{ url_for('presentation') }}"> Présentation</a>
+            {% endif %}
+        </div>
     </nav>
-    <main>
+    
+    <main id="main-content">
         {% block content %}{% endblock %}
     </main>
+    
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
