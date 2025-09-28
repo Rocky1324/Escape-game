@@ -1,12 +1,3 @@
-/**
- * ESCAPE GAME SVT - Enhanced JavaScript
- * Modern, Interactive, and Responsive Features
- */
-
-// ========================================
-// CONFIGURATION & CONSTANTS
-// ========================================
-
 const CONFIG = {
     animations: {
         duration: 300,
@@ -30,10 +21,6 @@ const CONFIG = {
         }
     }
 };
-
-// ========================================
-// UTILITY FUNCTIONS
-// ========================================
 
 const Utils = {
     // Generate unique IDs
